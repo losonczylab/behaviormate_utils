@@ -1,0 +1,11 @@
+#define BEHAVIOR_PC_IP 192, 168, 1, 100
+#define ARDUINO_IP_0 192, 168, 1, 101
+#define ARDUINO_IP_1 192, 168, 1, 121
+
+#define PC_PORT_0 5000
+#define PC_PORT_1 5200
+#define ARDUINO_PORT_0 5000
+#define ARDUINO_PORT_1 5200
+
+#define ARDUINO_MAC_0 0xDE, 0xAD, 0xBE, 0, 0xFE, 0xED
+#define ARDUINO_MAC_1 0xDE, 0xAD, 0xBE, 0, 0xFF, 0xED
