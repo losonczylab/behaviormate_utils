@@ -1,6 +1,7 @@
 # behaviormate_utils
 Arduino Code and Debugging Tools for behaviorMate
 
+pre-built version of Arduino Firmware: [https://www.losonczylab.org/behaviormate/]
 
 ---
 
@@ -37,13 +38,14 @@ at the same time send the following messages:*
 {"contexts": {"id": "tone_led", "action": "start"}}
 ```
 
-Message Routes:
+**Message Routes:**
 - "communicator"
 - "valves"
 - "contexts"
 - "sensors"
 
-Communicator
+
+**Communicator**
 - Actions:
   - "test"  
      $${\color{red} \text{\it trigger the arduino to respond with a "test passed" message}}$$
@@ -55,7 +57,8 @@ Communicator
   - "info"  
      $${\color{red} \text{\it causes the arduino to respond with the current version number of the firmware it is running}}$$
 
-Valve Manager
+
+**Valve Manager**
 - Address:
   - "pin" : int, required
 - Actions:
@@ -71,7 +74,8 @@ Valve Manager
   - "close"  
      $${\color{red} \text{\it set pin associated with this valve to LOW}}$$
 
-Context Manager
+
+**Context Manager**
 - Address:
   - "id" : str, required
 - Actions:
@@ -95,31 +99,32 @@ Context Manager
   - "stop"
   - "activate"
 
-Sensor Manager
- - Address
-  -- "pin" : int, required
- - Actions:
-  -- "create"
-   --- "type": str, ("lickport", "rfid_reader", "piezoport", "irport", "cap1188"), optional
-    --- if type "lickport":
+
+**Sensor Manager**
+- Address
+  - "pin" : int, required
+- Actions:
+  - "create"
+    - "type": str, ("lickport", "rfid_reader", "piezoport", "irport", "cap1188"), optional
+    - if type "lickport":
      *For MPR121 capacitance touch sensor circuit*
-     ---- "lickstart_threshold" : int, optional, default=19
-     ---- "lickstop_threshold" : int, optional, default=8
-     ---- "sensor" : int, optional, default=0
-    --- if type "rfid_reader":
-     ---- *depreciated*
-    --- if type "piezoport":
-    ---- "lick_threshold" : float, required
-    ---- "lick_duration" : int, required
-    ---- "min_interval" : int, optional default=200
-    --- if type "irport":
-    ---- "lick_threshold" : float, optional, default=0.75
-    --- if type "cap1188":
+      - "lickstart_threshold" : int, optional, default=19
+      - "lickstop_threshold" : int, optional, default=8
+      - "sensor" : int, optional, default=0
+    - if type "rfid_reader":
+      *depreciated*
+    - if type "piezoport":
+      - "lick_threshold" : float, required
+      - "lick_duration" : int, required
+      - "min_interval" : int, optional default=200
+    - if type "irport":
+      - "lick_threshold" : float, optional, default=0.75
+    - if type "cap1188":
     *For CAP1188 capacitance touch sensor circuit*
-    ---- "reset_pin": int, required
-    ---- "sensitivity": int, optional (default=7)
-    ---- "sensor": int, optional
-    ---- "mapping" : JsonObject, optional
-    ---- {"pin" int, required : "sensor" int, required}
-    --- "report_pin": int, optional, defaults to any
-  -- "clear"
+      - "reset_pin": int, required
+      - "sensitivity": int, optional (default=7)
+      - "sensor": int, optional
+      - "mapping" : JsonObject, optional
+      - {"pin" int, required : "sensor" int, required}
+    - "report_pin": int, optional, defaults to any
+  - "clear"
