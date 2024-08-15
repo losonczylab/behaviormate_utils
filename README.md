@@ -39,10 +39,10 @@ at the same time send the following messages:*
 ```
 
 **Message Routes:**
-- "communicator"
-- "valves"
-- "contexts"
-- "sensors"
+- "communicator" *(Communicator)*
+- "valves" *(Valve Manager)*
+- "contexts" *(Context Manager)*
+- "sensors" *(Sensor Manager)*
 
 
 **Communicator**
@@ -81,23 +81,34 @@ at the same time send the following messages:*
 - Actions:
   - "create"
     - "type" : str ("operant", "pulsed"), optional, default is none  
-       $${\color{red} \text{\it a}}$$
-    - for type "operant":
-      - "operant_rate" : int, optional, default=1
-         $${\color{red} \text{\it a}}$$
+       $${\color{red} \text{\it sets a custom context type on the arduino, if not included a base context is created}}$$
+    - for type "operant":  
+      $${\color{red} \text{\it operant contexts are triggered by sensor input}}$$
+      - "operant_rate" : int, optional, default=1  
+         $${\color{red} \text{\it how many times does the sensor have to flip from LOW to HIGH in order to start the context}}$$
       - "initial_open" : int (0, 1), optional, default=0  
-         $${\color{red} \text{\it a}}$$
-      - "sensor" : int, optional, default=0
-         $${\color{red} \text{\it a}}$$
-      - "enable_first" : bool, optional, default=false
-      - "max_count" : int, optional
-   - if type is "pulsed":
-     - "interval" : int, required
-   - "valves" : int[], required
-  - "durations" : int[], optional, defaults to stay on until context is stopped
-  - "start"
-  - "stop"
-  - "activate"
+         $${\color{red} \text{\it if set to 1, the valves will open once without sensor input}}$$
+      - "sensor" : int, optional, default=0  
+         $${\color{red} \text{\it Specify which sensor pin to trigger this context}}$$
+      - "enable_first" : bool, optional, default=false  
+         $${\color{red} \text{\it If operant rate > 1 than only require 1 input for the first triggering of the context (and use operant rate for all}}$$  
+         $${\color{red} \text{\it subsequent triggers)}}$$
+      - "max_count" : int, optional  
+         $${\color{red} \text{\it Sets a maximum number of times the context can be triggered for each time this context gets the "start" action}}$$
+   - if type is "pulsed":  
+     $${\color{red} \text{\it continue to re-start the context until the "stop" action is sent}}$$
+     - "interval" : int, required  
+        $${\color{red} \text{\it the interval (in ms) between triggering the context}}$$
+  - "valves" : int[], required.  
+      $${\color{red} \text{\it list of pins numbers/valves to associate with this context}}$$
+  - "durations" : int[], optional, defaults to stay on until context is stopped  
+     $${\color{red} \text{\it list of durations to activate valves for (in order as specified in the "valves" list)}}$$
+  - "start"  
+     $${\color{red} \text{\it start the context}}$$
+  - "stop"  
+     $${\color{red} \text{\it stop the context}}$$
+  - "activate"  
+     $${\color{red} \text{\it force context to be activated}}$$
 
 
 **Sensor Manager**
@@ -105,26 +116,48 @@ at the same time send the following messages:*
   - "pin" : int, required
 - Actions:
   - "create"
-    - "type": str, ("lickport", "rfid_reader", "piezoport", "irport", "cap1188"), optional
-    - if type "lickport":
-     *For MPR121 capacitance touch sensor circuit*
+    - "type": str, ("lickport", "rfid_reader", "piezoport", "irport", "cap1188"), optional  
+       $${\color{red} \text{\it specify a custom "type" of sensor, defaults to the base sensor which reports TTL pulses}}$$
+    - if type "lickport":  
+      $${\color{red} \text{\it For SparkFun MPR121 capacitance touch sensor circuit (discontinued)}}$$
       - "lickstart_threshold" : int, optional, default=19
       - "lickstop_threshold" : int, optional, default=8
-      - "sensor" : int, optional, default=0
+      - "sensor" : int, optional, default=0  
+         $${\color{red} \text{\it Only response to licks on this input channel on the MPR121 board}}$$
     - if type "rfid_reader":
-      *depreciated*
+      $${\color{red} \text{\it depreciated}}$$
     - if type "piezoport":
+      $${\color{red} \text{\it }}$$
       - "lick_threshold" : float, required
       - "lick_duration" : int, required
       - "min_interval" : int, optional default=200
     - if type "irport":
+      $${\color{red} \text{\it }}$$
       - "lick_threshold" : float, optional, default=0.75
-    - if type "cap1188":
-    *For CAP1188 capacitance touch sensor circuit*
-      - "reset_pin": int, required
-      - "sensitivity": int, optional (default=7)
-      - "sensor": int, optional
-      - "mapping" : JsonObject, optional
-      - {"pin" int, required : "sensor" int, required}
-    - "report_pin": int, optional, defaults to any
-  - "clear"
+    - if type "cap1188":  
+      $${\color{red} \text{\it For Adafruit CAP1188 capacitance touch sensor circuit}}$$
+      - "reset_pin": int, required  
+      - "sensitivity": int, optional (default=7)  
+      - "sensor": int, optional  
+         $${\color{red} \text{\it Only detect on this input to the CAP1188, 0-indexed (offset by 1 from board label), detect on all if omitted}}$$
+      - "mapping" : JsonObject, optional 
+        - {"pin" int, required : "sensor" int, required}  
+         $${\color{red} \text{\it map input channels on CAP1188 board to arbtrarty virtual "pin" numbers in Sensor Manager (for dual lickport setups)}}$$
+    - "report_pin": int, optional, defaults to any  
+       $${\color{red} \text{\it Set report pin to HIGH when sensor input is detected}}$$
+  - "clear"  
+    $${\color{red} \text{\it remove the sensor specified at the "pin" supplied in this message}}$$
+
+---
+### Position Controller
+
+*Position Controller sends 2 types of messages, but does not receive messages.*
+1. Position update message:  
+   ```
+   {"position": {"dy": <change in position>, "dt": <sampling time>}, "millis": <arduino time>}
+   ```
+   - position update messages are only sent if position has changed  
+3. Lap reset message (only for treadmill configuration with lap reset circuit attached):  
+   ```json
+   {"lap_reset": {"type": "IR 2 pin"}
+   ```
