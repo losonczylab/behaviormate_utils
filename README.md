@@ -12,30 +12,49 @@ controller is supplied as source code which must be built into runnable arduino
 
 
 ---
-Behavior Controller (GPIO) Message Routes:
- - "communicator"
- - "valves"
- - "contexts"
- - "sensors"
+### Behavior Controller (GPIO)
+
+*Message objects should be nested JSON objects under their route with the structure:*
+```
+  {<route>: {"action": <action>, <option>: <value>}}
+```
+*For example to configure a context that plays a tone (pin 51) and turns on an LED (pin 47)
+at the same time send the following messages:*
+```
+{"valves": {"pin": 51, "action": "create", "frequency": 5000}}
+{"valves": {"pin": 47, "action": "create"}}
+{"contexts": {"id": "tone_led", "action": "create", "valves": [51, 47], "durations": [500, 500]}}
+```
+*to start this example context send:*
+```
+{"contexts": {"id": "tone_led", "action": "start"}}
+```
+
+Message Routes:
+- "communicator"
+- "valves"
+- "contexts"
+- "sensors"
 
 Communicator
- - Actions:
-  -- "test"
-  -- "debug_mode"
-  -- "reset"
-  -- "info"
+- Actions:
+  - "test"
+  - "debug_mode"
+  - "reset"
+  - "info"
 
 Valve Manager
- - Address:
-  -- "pin" : int, required
- - Actions:
-  -- "create"
-   --- "frequency" : int, optional
-    *Sets to "type": "tone"*
-   --- "type" : str ("tone"), optional
-   --- "inverted" : bool, optional
- -- "open"
- -- "close"
+- Address:
+  - "pin" : int, required
+- Actions:
+  - "create"
+    - "frequency" : int, optional, also autmatically sets defualt "type" to "tone"
+    - "type" : str ("tone",), optional  
+       *uses arduino signal generator to oscillate output at frequency provided, will play a tone if speaker is plugged into the supplied pin* 
+    - "inverted" : bool, optional
+      *invert the output such that the signal is normally HIGH and switches to LOW when the valve is opened*
+  - "open"
+  - "close"
 
 Context Manager
  - Address:
@@ -53,7 +72,7 @@ Context Manager
    --- if type is "pulsed":
     ---- "interval" : int, required
    --- "valves" : int[], required
-   --- "durations" : int[], required
+   --- "durations" : int[], optional, defaults to stay on until context is stopped
   -- "start"
   -- "stop"
   -- "activate"
